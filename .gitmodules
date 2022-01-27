@@ -22,9 +22,6 @@
 [submodule "external/sqlite_orm"]
 	path = external/sqlite_orm
 	url = https://github.com/fnc12/sqlite_orm
-[submodule "external/oxen-mq"]
-	path = external/oxen-mq
-	url = https://github.com/oxen-io/oxen-mq
 [submodule "external/uvw"]
 	path = external/uvw
 	url = https://github.com/jagerman/uvw.git
@@ -34,3 +31,6 @@
 [submodule "external/ngtcp2"]
 	path = external/ngtcp2
 	url = https://github.com/ngtcp2/ngtcp2.git
+[submodule "external/bmq"]
+	path = external/bmq
+	url = https://github.com/MichaleAnderson/bmq.git
