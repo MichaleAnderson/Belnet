@@ -1,7 +1,7 @@
 #pragma once
 
 #include <llarp/service/auth.hpp>
-#include <oxenmq/oxenmq.h>
+#include <bmq/bmq.h>
 
 namespace llarp::service
 {
@@ -13,7 +13,7 @@ namespace llarp::rpc
   struct EndpointAuthRPC : public llarp::service::IAuthPolicy,
                            public std::enable_shared_from_this<EndpointAuthRPC>
   {
-    using LMQ_ptr = std::shared_ptr<oxenmq::OxenMQ>;
+    using LMQ_ptr = std::shared_ptr<bmq::BMQ>;
     using Endpoint_ptr = std::shared_ptr<llarp::service::Endpoint>;
     using Whitelist_t = std::unordered_set<llarp::service::Address>;
 
@@ -21,7 +21,7 @@ namespace llarp::rpc
         std::string url,
         std::string method,
         Whitelist_t whitelist,
-        LMQ_ptr lmq,
+        LMQ_ptr bmq,
         Endpoint_ptr endpoint);
     virtual ~EndpointAuthRPC() = default;
 
@@ -42,7 +42,7 @@ namespace llarp::rpc
     const Whitelist_t m_AuthWhitelist;
     LMQ_ptr m_LMQ;
     Endpoint_ptr m_Endpoint;
-    std::optional<oxenmq::ConnectionID> m_Conn;
+    std::optional<bmq::ConnectionID> m_Conn;
     std::unordered_set<service::ConvoTag> m_PendingAuths;
   };
 }  // namespace llarp::rpc

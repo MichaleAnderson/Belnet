@@ -562,10 +562,10 @@ namespace llarp::net
       if (parts[1].find_first_not_of('0') == std::string::npos and parts[0] != ifname)
       {
         const auto& ip = parts[2];
-        if ((ip.size() == sizeof(uint32_t) * 2) and oxenmq::is_hex(ip))
+        if ((ip.size() == sizeof(uint32_t) * 2) and bmq::is_hex(ip))
         {
           huint32_t x{};
-          oxenmq::from_hex(ip.begin(), ip.end(), reinterpret_cast<char*>(&x.h));
+          bmq::from_hex(ip.begin(), ip.end(), reinterpret_cast<char*>(&x.h));
           gateways.emplace_back(x.ToString());
         }
       }

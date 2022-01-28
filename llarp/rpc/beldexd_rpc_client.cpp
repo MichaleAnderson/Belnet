@@ -13,43 +13,43 @@ namespace llarp
 {
   namespace rpc
   {
-    static oxenmq::LogLevel
+    static bmq::LogLevel
     toLokiMQLogLevel(llarp::LogLevel level)
     {
       switch (level)
       {
         case eLogError:
-          return oxenmq::LogLevel::error;
+          return bmq::LogLevel::error;
         case eLogWarn:
-          return oxenmq::LogLevel::warn;
+          return bmq::LogLevel::warn;
         case eLogInfo:
-          return oxenmq::LogLevel::info;
+          return bmq::LogLevel::info;
         case eLogDebug:
-          return oxenmq::LogLevel::debug;
+          return bmq::LogLevel::debug;
         case eLogNone:
         default:
-          return oxenmq::LogLevel::trace;
+          return bmq::LogLevel::trace;
       }
     }
 
-    BeldexdRpcClient::BeldexdRpcClient(LMQ_ptr lmq, std::weak_ptr<AbstractRouter> r)
-        : m_lokiMQ{std::move(lmq)}, m_Router{std::move(r)}
+    BeldexdRpcClient::BeldexdRpcClient(LMQ_ptr bmq, std::weak_ptr<AbstractRouter> r)
+        : m_lokiMQ{std::move(bmq)}, m_Router{std::move(r)}
     {
       // m_lokiMQ->log_level(toBeldexMQLogLevel(LogLevel::Instance().curLevel));
 
       // new block handler
-      m_lokiMQ->add_category("notify", oxenmq::Access{oxenmq::AuthLevel::none})
-          .add_command("block", [this](oxenmq::Message& m) { HandleNewBlock(m); });
+      m_lokiMQ->add_category("notify", bmq::Access{bmq::AuthLevel::none})
+          .add_command("block", [this](bmq::Message& m) { HandleNewBlock(m); });
 
       // TODO: proper auth here
-      auto beldexdCategory = m_lokiMQ->add_category("beldexd", oxenmq::Access{oxenmq::AuthLevel::none});
+      auto beldexdCategory = m_lokiMQ->add_category("beldexd", bmq::Access{bmq::AuthLevel::none});
       beldexdCategory.add_request_command(
-          "get_peer_stats", [this](oxenmq::Message& m) { HandleGetPeerStats(m); });
+          "get_peer_stats", [this](bmq::Message& m) { HandleGetPeerStats(m); });
       m_UpdatingList = false;
     }
 
     void
-    BeldexdRpcClient::ConnectAsync(oxenmq::address url)
+    BeldexdRpcClient::ConnectAsync(bmq::address url)
     {
       if (auto router = m_Router.lock())
       {
@@ -57,11 +57,11 @@ namespace llarp
         {
           throw std::runtime_error("we cannot talk to beldexd while not a master node");
         }
-        LogInfo("connecting to beldexd via LMQ at ", url);
+        LogInfo("connecting to beldexd via BMQ at ", url);
         m_Connection = m_lokiMQ->connect_remote(
             url,
-            [self = shared_from_this()](oxenmq::ConnectionID) { self->Connected(); },
-            [self = shared_from_this(), url](oxenmq::ConnectionID, std::string_view f) {
+            [self = shared_from_this()](bmq::ConnectionID) { self->Connected(); },
+            [self = shared_from_this(), url](bmq::ConnectionID, std::string_view f) {
               llarp::LogWarn("Failed to connect to beldexd: ", f);
               if (auto router = self->m_Router.lock())
               {
@@ -79,7 +79,7 @@ namespace llarp
     }
 
     void
-    BeldexdRpcClient::HandleNewBlock(oxenmq::Message& msg)
+    BeldexdRpcClient::HandleNewBlock(bmq::Message& msg)
     {
       if (msg.data.size() != 2)
       {
@@ -334,8 +334,8 @@ namespace llarp
               {
                 service::EncryptedName result;
                 const auto j = nlohmann::json::parse(data[1]);
-                result.ciphertext = oxenmq::from_hex(j["encrypted_value"].get<std::string>());
-                const auto nonce = oxenmq::from_hex(j["nonce"].get<std::string>());
+                result.ciphertext = bmq::from_hex(j["encrypted_value"].get<std::string>());
+                const auto nonce = bmq::from_hex(j["nonce"].get<std::string>());
                 if (nonce.size() != result.nonce.size())
                 {
                   throw std::invalid_argument(stringify(
@@ -360,7 +360,7 @@ namespace llarp
     }
 
     void
-    BeldexdRpcClient::HandleGetPeerStats(oxenmq::Message& msg)
+    BeldexdRpcClient::HandleGetPeerStats(bmq::Message& msg)
     {
       LogInfo("Got request for peer stats (size: ", msg.data.size(), ")");
       for (auto str : msg.data)
@@ -392,7 +392,7 @@ namespace llarp
           }
 
           std::vector<std::string> routerIdStrings;
-          oxenmq::bt_deserialize(msg.data[0], routerIdStrings);
+          bmq::bt_deserialize(msg.data[0], routerIdStrings);
 
           std::vector<RouterID> routerIds;
           routerIds.reserve(routerIdStrings.size());

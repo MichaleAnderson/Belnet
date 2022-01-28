@@ -44,7 +44,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <oxenmq/address.h>
+#include <bmq/address.h>
 
 namespace llarp
 {
@@ -83,7 +83,7 @@ namespace llarp
     }
 
     const LMQ_ptr&
-    lmq() const override
+    bmq() const override
     {
       return m_lmq;
     }
@@ -203,7 +203,7 @@ namespace llarp
     llarp_dht_context* _dht = nullptr;
     std::shared_ptr<NodeDB> _nodedb;
     llarp_time_t _startedAt;
-    const oxenmq::TaggedThreadID m_DiskThread;
+    const bmq::TaggedThreadID m_DiskThread;
 
     llarp_time_t
     Uptime() const override;
@@ -281,16 +281,16 @@ namespace llarp
     void
     PumpLL() override;
 
-    const oxenmq::address DefaultRPCBindAddr = oxenmq::address::tcp("127.0.0.1", 1190);
+    const bmq::address DefaultRPCBindAddr = bmq::address::tcp("127.0.0.1", 1190);
     bool enableRPCServer = false;
-    oxenmq::address rpcBindAddr = DefaultRPCBindAddr;
+    bmq::address rpcBindAddr = DefaultRPCBindAddr;
     std::unique_ptr<rpc::RpcServer> m_RPCServer;
 
     const llarp_time_t _randomStartDelay;
 
     std::shared_ptr<rpc::BeldexdRpcClient> m_beldexdRpcClient;
 
-    oxenmq::address beldexdRPCAddr;
+    bmq::address beldexdRPCAddr;
     Profiling _routerProfiling;
     fs::path _profilesFile;
     OutboundMessageHandler _outboundMessageHandler;

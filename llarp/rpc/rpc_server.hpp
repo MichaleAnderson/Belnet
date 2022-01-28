@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string_view>
-#include <oxenmq/oxenmq.h>
-#include <oxenmq/address.h>
+#include <bmq/bmq.h>
+#include <bmq/address.h>
 
 namespace llarp
 {
@@ -11,14 +11,14 @@ namespace llarp
 
 namespace llarp::rpc
 {
-  using LMQ_ptr = std::shared_ptr<oxenmq::OxenMQ>;
+  using LMQ_ptr = std::shared_ptr<bmq::BMQ>;
 
   struct RpcServer
   {
     explicit RpcServer(LMQ_ptr, AbstractRouter*);
     ~RpcServer() = default;
     void
-    AsyncServeRPC(oxenmq::address addr);
+    AsyncServeRPC(bmq::address addr);
 
    private:
     LMQ_ptr m_LMQ;

@@ -14,7 +14,7 @@
 #include <optional>
 #include <unordered_set>
 #include <set>
-#include "oxenmq/variant.h"
+#include "bmq/variant.h"
 
 namespace llarp
 {

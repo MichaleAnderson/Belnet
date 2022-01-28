@@ -25,7 +25,7 @@
 #include <vector>
 #include <unordered_set>
 
-#include <oxenmq/address.h>
+#include <bmq/address.h>
 
 namespace llarp
 {
@@ -184,7 +184,7 @@ namespace llarp
   {
     bool whitelistRouters = false;
     fs::path ident_keyfile;
-    oxenmq::address beldexdRPCAddr;
+    bmq::address beldexdRPCAddr;
 
     void
     defineConfigOptions(ConfigDefinition& conf, const ConfigGenParameters& params);

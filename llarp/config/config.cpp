@@ -318,7 +318,7 @@ namespace llarp
         ClientOnly,
         Comment{
             "Set the endpoint authentication mechanism.",
-            "none/whitelist/lmq",
+            "none/whitelist/bmq",
         },
         [this](std::string arg) {
           if (arg.empty())
@@ -328,22 +328,22 @@ namespace llarp
 
     conf.defineOption<std::string>(
         "network",
-        "auth-lmq",
+        "auth-bmq",
         ClientOnly,
         AssignmentAcceptor(m_AuthUrl),
         Comment{
-            "lmq endpoint to talk to for authenticating new sessions",
+            "bmq endpoint to talk to for authenticating new sessions",
             "ipc:///var/lib/belnet/auth.socket",
             "tcp://127.0.0.1:5555",
         });
 
     conf.defineOption<std::string>(
         "network",
-        "auth-lmq-method",
+        "auth-bmq-method",
         ClientOnly,
         Default{"llarp.auth"},
         Comment{
-            "lmq function to call for authenticating new sessions",
+            "bmq function to call for authenticating new sessions",
             "llarp.auth",
         },
         [this](std::string arg) {
@@ -916,7 +916,7 @@ namespace llarp
         Default{not params.isRelay},
         AssignmentAcceptor(m_enableRPCServer),
         Comment{
-            "Determines whether or not the LMQ JSON API is enabled. Defaults ",
+            "Determines whether or not the BMQ JSON API is enabled. Defaults ",
         });
 
     conf.defineOption<std::string>(
@@ -965,7 +965,7 @@ namespace llarp
         return;
       throw std::invalid_argument(
           "the [beldexd]:jsonrpc option is no longer supported; please use the [beldexd]:rpc config "
-          "option instead with beldexd's lmq-local-control address -- typically a value such as "
+          "option instead with beldexd's bmq-local-control address -- typically a value such as "
           "rpc=ipc:///var/lib/beldex/beldexd.sock or rpc=ipc:///home/mnode/.beldex/beldexd.sock");
     });
 
@@ -975,14 +975,14 @@ namespace llarp
         RelayOnly,
         Comment{
             "beldexmq control address for for communicating with beldexd. Depends on beldexd's",
-            "lmq-local-control configuration option. By default this value should be",
+            "bmq-local-control configuration option. By default this value should be",
             "ipc://BELDEXD-DATA-DIRECTORY/beldexd.sock, such as:",
             "    rpc=ipc:///var/lib/beldex/beldexd.sock",
             "    rpc=ipc:///home/USER/.beldex/beldexd.sock",
             "but can use (non-default) TCP if beldexd is configured that way:",
             "    rpc=tcp://127.0.0.1:5678",
         },
-        [this](std::string arg) { beldexdRPCAddr = oxenmq::address(arg); });
+        [this](std::string arg) { beldexdRPCAddr = bmq::address(arg); });
 
     // Deprecated options:
     conf.defineOption<std::string>("beldexd", "username", Deprecated);

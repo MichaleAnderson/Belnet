@@ -40,7 +40,7 @@
 #include <systemd/sd-daemon.h>
 #endif
 
-#include <oxenmq/oxenmq.h>
+#include <bmq/bmq.h>
 
 static constexpr std::chrono::milliseconds ROUTER_TICK_INTERVAL = 250ms;
 
@@ -48,7 +48,7 @@ namespace llarp
 {
   Router::Router(EventLoop_ptr loop, std::shared_ptr<vpn::Platform> vpnPlatform)
       : ready(false)
-      , m_lmq(std::make_shared<oxenmq::OxenMQ>())
+      , m_lmq(std::make_shared<bmq::BMQ>())
       , _loop(std::move(loop))
       , _vpnPlatform(std::move(vpnPlatform))
       , paths(this)
@@ -285,13 +285,13 @@ namespace llarp
     whitelistRouters = conf.beldexd.whitelistRouters;
     if (whitelistRouters)
     {
-      beldexdRPCAddr = oxenmq::address(conf.beldexd.beldexdRPCAddr);
+      beldexdRPCAddr = bmq::address(conf.beldexd.beldexdRPCAddr);
       m_beldexdRpcClient = std::make_shared<rpc::BeldexdRpcClient>(m_lmq, weak_from_this());
     }
 
     enableRPCServer = conf.api.m_enableRPCServer;
     if (enableRPCServer)
-      rpcBindAddr = oxenmq::address(conf.api.m_rpcBindAddr);
+      rpcBindAddr = bmq::address(conf.api.m_rpcBindAddr);
 
     if (not StartRpcServer())
       throw std::runtime_error("Failed to start rpc server");
@@ -483,7 +483,7 @@ namespace llarp
 
     // Beldexd Config
     whitelistRouters = conf.beldexd.whitelistRouters;
-    beldexdRPCAddr = oxenmq::address(conf.beldexd.beldexdRPCAddr);
+    beldexdRPCAddr = bmq::address(conf.beldexd.beldexdRPCAddr);
 
     m_isMasterNode = conf.router.m_isRelay;
 

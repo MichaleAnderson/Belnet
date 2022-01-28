@@ -21,13 +21,13 @@
 #include <optional>
 #include <unordered_map>
 #include <variant>
-#include <oxenmq/variant.h>
+#include <bmq/variant.h>
 #include "endpoint_types.hpp"
 #include "llarp/endpoint_base.hpp"
 
 #include "auth.hpp"
 
-#include <oxenmq/variant.h>
+#include <bmq/variant.h>
 
 // minimum time between introset shifts
 #ifndef MIN_SHIFT_INTERVAL

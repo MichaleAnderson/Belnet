@@ -14,12 +14,12 @@
 
 namespace llarp::rpc
 {
-  RpcServer::RpcServer(LMQ_ptr lmq, AbstractRouter* r) : m_LMQ(std::move(lmq)), m_Router(r)
+  RpcServer::RpcServer(LMQ_ptr bmq, AbstractRouter* r) : m_LMQ(std::move(bmq)), m_Router(r)
   {}
 
   /// maybe parse json from message paramter at index
   std::optional<nlohmann::json>
-  MaybeParseJSON(const oxenmq::Message& msg, size_t index = 0)
+  MaybeParseJSON(const bmq::Message& msg, size_t index = 0)
   {
     try
     {
@@ -70,7 +70,7 @@ namespace llarp::rpc
 
   void
   HandleJSONRequest(
-      oxenmq::Message& msg, std::function<void(nlohmann::json, ReplyFunction_t)> handleRequest)
+      bmq::Message& msg, std::function<void(nlohmann::json, ReplyFunction_t)> handleRequest)
   {
     const auto maybe = MaybeParseJSON(msg);
     if (not maybe.has_value())
@@ -95,13 +95,13 @@ namespace llarp::rpc
   }
 
   void
-  RpcServer::AsyncServeRPC(oxenmq::address url)
+  RpcServer::AsyncServeRPC(bmq::address url)
   {
     m_LMQ->listen_plain(url.zmq_address());
-    m_LMQ->add_category("llarp", oxenmq::AuthLevel::none)
+    m_LMQ->add_category("llarp", bmq::AuthLevel::none)
         .add_command(
             "halt",
-            [&](oxenmq::Message& msg) {
+            [&](bmq::Message& msg) {
               if (not m_Router->IsRunning())
               {
                 msg.send_reply(CreateJSONError("router is not running"));
@@ -112,14 +112,14 @@ namespace llarp::rpc
             })
         .add_request_command(
             "version",
-            [r = m_Router](oxenmq::Message& msg) {
+            [r = m_Router](bmq::Message& msg) {
               util::StatusObject result{
                   {"version", llarp::VERSION_FULL}, {"uptime", to_json(r->Uptime())}};
               msg.send_reply(CreateJSONResponse(result));
             })
         .add_request_command(
             "status",
-            [&](oxenmq::Message& msg) {
+            [&](bmq::Message& msg) {
               m_Router->loop()->call([defer = msg.send_later(), r = m_Router]() {
                 std::string data;
                 if (r->IsRunning())
@@ -135,7 +135,7 @@ namespace llarp::rpc
             })
         .add_request_command(
             "quic_connect",
-            [&](oxenmq::Message& msg) {
+            [&](bmq::Message& msg) {
               HandleJSONRequest(msg, [r = m_Router](nlohmann::json obj, ReplyFunction_t reply) {
                 std::string endpoint = "default";
                 if (auto itr = obj.find("endpoint"); itr != obj.end())
@@ -208,7 +208,7 @@ namespace llarp::rpc
             })
         .add_request_command(
             "quic_listener",
-            [&](oxenmq::Message& msg) {
+            [&](bmq::Message& msg) {
               HandleJSONRequest(msg, [r = m_Router](nlohmann::json obj, ReplyFunction_t reply) {
                 std::string endpoint = "default";
                 if (auto itr = obj.find("endpoint"); itr != obj.end())
@@ -285,7 +285,7 @@ namespace llarp::rpc
             })
         .add_request_command(
             "lookup_mnode",
-            [&](oxenmq::Message& msg) {
+            [&](bmq::Message& msg) {
               HandleJSONRequest(msg, [r = m_Router](nlohmann::json obj, ReplyFunction_t reply) {
                 if (not r->IsMasterNode())
                 {
@@ -330,7 +330,7 @@ namespace llarp::rpc
             })
         .add_request_command(
             "endpoint",
-            [&](oxenmq::Message& msg) {
+            [&](bmq::Message& msg) {
               HandleJSONRequest(msg, [r = m_Router](nlohmann::json obj, ReplyFunction_t reply) {
                 if (r->IsMasterNode())
                 {
@@ -386,7 +386,7 @@ namespace llarp::rpc
             })
         .add_request_command(
             "exit",
-            [&](oxenmq::Message& msg) {
+            [&](bmq::Message& msg) {
               HandleJSONRequest(msg, [r = m_Router](nlohmann::json obj, ReplyFunction_t reply) {
                 if (r->IsMasterNode())
                 {
@@ -562,7 +562,7 @@ namespace llarp::rpc
                 });
               });
             })
-        .add_request_command("config", [&](oxenmq::Message& msg) {
+        .add_request_command("config", [&](bmq::Message& msg) {
           HandleJSONRequest(msg, [r = m_Router](nlohmann::json obj, ReplyFunction_t reply) {
             {
               const auto itr = obj.find("override");

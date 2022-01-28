@@ -23,9 +23,9 @@
 struct llarp_buffer_t;
 struct llarp_dht_context;
 
-namespace oxenmq
+namespace bmq
 {
-  class OxenMQ;
+  class BMQ;
 }
 
 namespace llarp
@@ -80,7 +80,7 @@ namespace llarp
     class Platform;
   }
 
-  using LMQ_ptr = std::shared_ptr<oxenmq::OxenMQ>;
+  using LMQ_ptr = std::shared_ptr<bmq::BMQ>;
 
   struct AbstractRouter : public std::enable_shared_from_this<AbstractRouter>
   {
@@ -94,7 +94,7 @@ namespace llarp
     HandleRecvLinkMessageBuffer(ILinkSession* from, const llarp_buffer_t& msg) = 0;
 
     virtual const LMQ_ptr&
-    lmq() const = 0;
+    bmq() const = 0;
 
     virtual vpn::Platform*
     GetVPNPlatform() const = 0;

@@ -2,8 +2,8 @@
 
 #include <llarp/router_id.hpp>
 
-#include <oxenmq/oxenmq.h>
-#include <oxenmq/address.h>
+#include <bmq/bmq.h>
+#include <bmq/address.h>
 #include <llarp/crypto/types.hpp>
 #include <llarp/dht/key.hpp>
 #include <llarp/service/name.hpp>
@@ -14,16 +14,16 @@ namespace llarp
 
   namespace rpc
   {
-    using LMQ_ptr = std::shared_ptr<oxenmq::OxenMQ>;
+    using LMQ_ptr = std::shared_ptr<bmq::BMQ>;
 
-    /// The BeldexdRpcClient uses loki-mq to talk to make API requests to beldexd.
+    /// The BeldexdRpcClient uses bmq to talk to make API requests to beldexd.
     struct BeldexdRpcClient : public std::enable_shared_from_this<BeldexdRpcClient>
     {
-      explicit BeldexdRpcClient(LMQ_ptr lmq, std::weak_ptr<AbstractRouter> r);
+      explicit BeldexdRpcClient(LMQ_ptr bmq, std::weak_ptr<AbstractRouter> r);
 
       /// Connect to beldexd async
       void
-      ConnectAsync(oxenmq::address url);
+      ConnectAsync(bmq::address url);
 
       /// blocking request identity key from beldexd
       /// throws on failure
@@ -51,7 +51,7 @@ namespace llarp
       void
       Connected();
 
-      /// do a lmq command on the current connection
+      /// do a bmq command on the current connection
       void
       Command(std::string_view cmd);
 
@@ -77,13 +77,13 @@ namespace llarp
 
       // Handles request from beldexd for peer stats on a specific peer
       void
-      HandleGetPeerStats(oxenmq::Message& msg);
+      HandleGetPeerStats(bmq::Message& msg);
 
       // Handles notification of a new block
       void
-      HandleNewBlock(oxenmq::Message& msg);
+      HandleNewBlock(bmq::Message& msg);
 
-      std::optional<oxenmq::ConnectionID> m_Connection;
+      std::optional<bmq::ConnectionID> m_Connection;
       LMQ_ptr m_lokiMQ;
 
       std::weak_ptr<AbstractRouter> m_Router;

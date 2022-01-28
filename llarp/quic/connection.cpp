@@ -15,8 +15,8 @@
 #include <uvw/timer.h>
 
 #include <iterator>
-#include <oxenmq/hex.h>
-#include <oxenmq/bt_serialize.h>
+#include <bmq/hex.h>
+#include <bmq/bt_serialize.h>
 
 extern "C"
 {
@@ -35,7 +35,7 @@ namespace llarp::quic
   std::ostream&
   operator<<(std::ostream& o, const ConnectionID& c)
   {
-    return o << oxenmq::to_hex(c.data, c.data + c.datalen);
+    return o << bmq::to_hex(c.data, c.data + c.datalen);
   }
 
   ConnectionID
@@ -300,7 +300,7 @@ namespace llarp::quic
       conn.endpoint.make_stateless_reset_token(cid, token);
       LogDebug(
           "make stateless reset token ",
-          oxenmq::to_hex(token, token + NGTCP2_STATELESS_RESET_TOKENLEN));
+          bmq::to_hex(token, token + NGTCP2_STATELESS_RESET_TOKENLEN));
 
       return 0;
     }
@@ -1096,7 +1096,7 @@ namespace llarp::quic
     uint16_t port;
     try
     {
-      oxenmq::bt_dict_consumer meta{belnet_metadata};
+      bmq::bt_dict_consumer meta{belnet_metadata};
       // '#' contains the port the client wants us to forward to
       if (!meta.skip_until("#"))
       {
@@ -1111,7 +1111,7 @@ namespace llarp::quic
       }
       LogDebug("decoded belnet tunnel port = ", port);
     }
-    catch (const oxenmq::bt_deserialize_invalid& c)
+    catch (const bmq::bt_deserialize_invalid& c)
     {
       LogWarn("transport params belnet metadata is invalid: ", c.what());
       return NGTCP2_ERR_TRANSPORT_PARAM;
@@ -1195,7 +1195,7 @@ namespace llarp::quic
       // reserved field code that QUIC parsers must ignore); currently we only include the port in
       // here (from the client to tell the server what it's trying to reach, and reflected from
       // the server for the client to verify).
-      std::string belnet_metadata = bt_serialize(oxenmq::bt_dict{
+      std::string belnet_metadata = bt_serialize(bmq::bt_dict{
           {"#", tunnel_port},
       });
       copy_and_advance(buf, belnet_metadata_code);

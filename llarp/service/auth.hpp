@@ -70,7 +70,7 @@ namespace llarp::service
     eAuthTypeNone,
     /// manual whitelist
     eAuthTypeWhitelist,
-    /// LMQ server
+    /// BMQ server
     eAuthTypeLMQ
   };
 

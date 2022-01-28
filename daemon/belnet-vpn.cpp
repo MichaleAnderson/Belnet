@@ -1,4 +1,4 @@
-#include <oxenmq/oxenmq.h>
+#include <bmq/bmq.h>
 #include <nlohmann/json.hpp>
 #include <cxxopts.hpp>
 #include <future>
@@ -16,12 +16,12 @@
 #include <sys/wait.h>
 #endif
 
-/// do a oxenmq request on an lmq instance blocking style
+/// do a bmq request on an bmq instance blocking style
 /// returns a json object parsed from the result
 std::optional<nlohmann::json>
 LMQ_Request(
-    oxenmq::OxenMQ& lmq,
-    const oxenmq::ConnectionID& id,
+    bmq::BMQ& bmq,
+    const bmq::ConnectionID& id,
     std::string_view method,
     std::optional<nlohmann::json> args = std::nullopt)
 {
@@ -37,11 +37,11 @@ LMQ_Request(
   };
   if (args.has_value())
   {
-    lmq.request(id, method, handleRequest, args->dump());
+    bmq.request(id, method, handleRequest, args->dump());
   }
   else
   {
-    lmq.request(id, method, handleRequest);
+    bmq.request(id, method, handleRequest);
   }
   auto ftr = result_promise.get_future();
   const auto str = ftr.get();
@@ -71,12 +71,12 @@ main(int argc, char* argv[])
     ("range", "ip range to map", cxxopts::value<std::string>())
     ;
   // clang-format on
-  oxenmq::address rpcURL("tcp://127.0.0.1:1190");
+  bmq::address rpcURL("tcp://127.0.0.1:1190");
   std::string exitAddress;
   std::string endpoint = "default";
   std::optional<std::string> token;
   std::string range = "::/0";
-  oxenmq::LogLevel logLevel = oxenmq::LogLevel::warn;
+  bmq::LogLevel logLevel = bmq::LogLevel::warn;
   bool goUp = false;
   bool goDown = false;
   bool printStatus = false;
@@ -93,11 +93,11 @@ main(int argc, char* argv[])
 
     if (result.count("verbose") > 0)
     {
-      logLevel = oxenmq::LogLevel::debug;
+      logLevel = bmq::LogLevel::debug;
     }
     if (result.count("rpc") > 0)
     {
-      rpcURL = oxenmq::address(result["rpc"].as<std::string>());
+      rpcURL = bmq::address(result["rpc"].as<std::string>());
     }
     if (result.count("exit") > 0)
     {
@@ -147,17 +147,17 @@ main(int argc, char* argv[])
     return 1;
   }
 
-  oxenmq::OxenMQ lmq{
-      [](oxenmq::LogLevel lvl, const char* file, int line, std::string msg) {
+  bmq::BMQ bmq{
+      [](bmq::LogLevel lvl, const char* file, int line, std::string msg) {
         std::cout << lvl << " [" << file << ":" << line << "] " << msg << std::endl;
       },
       logLevel};
 
-  lmq.start();
+  bmq.start();
 
   std::promise<bool> connectPromise;
 
-  const auto connID = lmq.connect_remote(
+  const auto connID = bmq.connect_remote(
       rpcURL,
       [&connectPromise](auto) { connectPromise.set_value(true); },
       [&connectPromise](auto, std::string_view msg) {
@@ -173,7 +173,7 @@ main(int argc, char* argv[])
 
   if (killDaemon)
   {
-    const auto maybe = LMQ_Request(lmq, connID, "llarp.halt");
+    const auto maybe = LMQ_Request(bmq, connID, "llarp.halt");
     if (not maybe.has_value())
     {
       std::cout << "call to llarp.admin.die failed" << std::endl;
@@ -184,7 +184,7 @@ main(int argc, char* argv[])
 
   if (printStatus)
   {
-    const auto maybe_status = LMQ_Request(lmq, connID, "llarp.status");
+    const auto maybe_status = LMQ_Request(bmq, connID, "llarp.status");
     if (not maybe_status.has_value())
     {
       std::cout << "call to llarp.status failed" << std::endl;
@@ -220,7 +220,7 @@ main(int argc, char* argv[])
     if (token.has_value())
     {
       maybe_result = LMQ_Request(
-          lmq,
+          bmq,
           connID,
           "llarp.exit",
           nlohmann::json{{"exit", exitAddress}, {"range", range}, {"token", *token}});
@@ -228,7 +228,7 @@ main(int argc, char* argv[])
     else
     {
       maybe_result = LMQ_Request(
-          lmq, connID, "llarp.exit", nlohmann::json{{"exit", exitAddress}, {"range", range}});
+          bmq, connID, "llarp.exit", nlohmann::json{{"exit", exitAddress}, {"range", range}});
     }
 
     if (not maybe_result.has_value())
@@ -245,7 +245,7 @@ main(int argc, char* argv[])
   }
   if (goDown)
   {
-    LMQ_Request(lmq, connID, "llarp.exit", nlohmann::json{{"range", range}, {"unmap", true}});
+    LMQ_Request(bmq, connID, "llarp.exit", nlohmann::json{{"range", range}, {"unmap", true}});
   }
 
   return 0;

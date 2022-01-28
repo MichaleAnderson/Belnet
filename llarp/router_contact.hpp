@@ -18,10 +18,10 @@
 #define MAX_RC_SIZE (1024)
 #define NICKLEN (32)
 
-namespace oxenmq
+namespace bmq
 {
   class bt_list_consumer;
-}  // namespace oxenmq
+}  // namespace bmq
 
 namespace llarp
 {
@@ -224,7 +224,7 @@ namespace llarp
     DecodeVersion_0(llarp_buffer_t* buf);
 
     bool
-    DecodeVersion_1(oxenmq::bt_list_consumer& btlist);
+    DecodeVersion_1(bmq::bt_list_consumer& btlist);
   };
 
   inline std::ostream&

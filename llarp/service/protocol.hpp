@@ -47,7 +47,7 @@ namespace llarp
       uint64_t seqno = 0;
       uint64_t version = LLARP_PROTO_VERSION;
 
-      /// encode metainfo for lmq endpoint auth
+      /// encode metainfo for bmq endpoint auth
       std::vector<char>
       EncodeAuthInfo() const;
 

@@ -22,7 +22,7 @@ namespace llarp::service
   ParseAuthType(std::string data)
   {
     std::unordered_map<std::string, AuthType> values = {
-        {"lmq", AuthType::eAuthTypeLMQ},
+        {"bmq", AuthType::eAuthTypeLMQ},
         {"whitelist", AuthType::eAuthTypeWhitelist},
         {"none", AuthType::eAuthTypeNone}};
     const auto itr = values.find(data);

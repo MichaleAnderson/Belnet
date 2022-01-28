@@ -34,7 +34,7 @@ target_link_libraries(belnet-util PUBLIC
   nlohmann_json::nlohmann_json
   filesystem
   date::date
-  oxenmq::oxenmq
+  bmq::bmq
 )
 
 if(ANDROID)

@@ -104,7 +104,7 @@ namespace llarp
         .def_property(
             "beldexdRPCAddr",
             [](BeldexdConfig& self) { return self.beldexdRPCAddr.full_address().c_str(); },
-            [](BeldexdConfig& self, std::string arg) { self.beldexdRPCAddr = oxenmq::address(arg); });
+            [](BeldexdConfig& self, std::string arg) { self.beldexdRPCAddr = bmq::address(arg); });
 
     py::class_<BootstrapConfig>(mod, "BootstrapConfig")
         .def(py::init<>())

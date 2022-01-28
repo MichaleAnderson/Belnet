@@ -7,12 +7,12 @@ namespace llarp::rpc
       std::string url,
       std::string method,
       Whitelist_t whitelist,
-      LMQ_ptr lmq,
+      LMQ_ptr bmq,
       Endpoint_ptr endpoint)
       : m_AuthURL(std::move(url))
       , m_AuthMethod(std::move(method))
       , m_AuthWhitelist(std::move(whitelist))
-      , m_LMQ(std::move(lmq))
+      , m_LMQ(std::move(bmq))
       , m_Endpoint(std::move(endpoint))
   {}
 
@@ -23,11 +23,11 @@ namespace llarp::rpc
       return;
     m_LMQ->connect_remote(
         m_AuthURL,
-        [self = shared_from_this()](oxenmq::ConnectionID c) {
+        [self = shared_from_this()](bmq::ConnectionID c) {
           self->m_Conn = std::move(c);
           LogInfo("connected to endpoint auth server via ", *self->m_Conn);
         },
-        [self = shared_from_this()](oxenmq::ConnectionID, std::string_view fail) {
+        [self = shared_from_this()](bmq::ConnectionID, std::string_view fail) {
           LogWarn("failed to connect to endpoint auth server: ", fail);
           self->m_Endpoint->Loop()->call_later(1s, [self] { self->Start(); });
         });
